@@ -1,0 +1,10 @@
+name = "kevindex"
+main = "src/worker.js"
+
+workers_dev = true
+
+kv_namespaces = [
+{
+	binding = "kevindex", id = "ENV"
+}
+]

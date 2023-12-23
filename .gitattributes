@@ -1,0 +1,3 @@
+**/*.sh eol=lf text
+**/*.js eol=lf text
+**/*.json eol=lf text

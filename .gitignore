@@ -1,0 +1,10 @@
+.vscode
+
+rclone
+rclone.conf
+rclone.exe
+
+**/*test*
+
+resources/*
+GDI-Cloudflare/*

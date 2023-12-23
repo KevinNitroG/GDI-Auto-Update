@@ -1,0 +1,104 @@
+name: GDI Update
+
+on:
+  schedule:
+    - cron: "0 20 * * *"
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  #   branches:
+  #     - main
+  watch:
+    types: [started]
+
+concurrency:
+  group: update
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    name: GDI Update
+    env:
+      USER_RCLONE_CONFIG: ${{ secrets.USER_RCLONE_CONFIG || vars.USER_RCLONE_CONFIG }}
+      RCLONE_DRIVE_NAME: ${{ secrets.RCLONE_DRIVE_NAME || vars.RCLONE_DRIVE_NAME }}
+      USER_HEADER: ${{ secrets.USER_HEADER || vars.USER_HEADER }}
+      DRIVE_ROOT: ${{ secrets.DRIVE_ROOT || vars.DRIVE_ROOT }}
+      WRANGLER_TOML: ${{ secrets.WRANGLER_TOML || vars.WRANGLER_TOML }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || vars.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@main
+
+      - name: Cache Rclone installation
+        uses: actions/cache@main
+        id: cache-rclone
+        if: ${{ env.USER_RCLONE_CONFIG }}
+        with:
+          path: rclone
+          key: rclone
+
+      - name: Install Rclone
+        if: steps.cache-rclone.outputs.cache-hit != 'true'
+        run: scripts/installRclone.sh
+
+      - name: Get Drive Root
+        if: ${{ env.DRIVE_ROOT }}
+        run: scripts/getDataToFile.sh ${{ env.DRIVE_ROOT }} "resources/driveRoot.json"
+
+      - name: Get Rclone config, List Drives, Add to GDI
+        if: ${{ env.USER_RCLONE_CONFIG }}
+        run: |
+          scripts/getDataToFile.sh ${{ env.USER_RCLONE_CONFIG }} "rclone.conf"
+          scripts/rcloneListDrives.sh ${{ env.RCLONE_DRIVE_NAME }}
+
+      - name: Get user header of GDI
+        run: scripts/getDataToFile.sh ${{ env.USER_HEADER }} "resources/userHeader.js"
+
+      - name: Get GDI script
+        run: curl -o resources/GDI.js https://gitlab.com/GoogleDriveIndex/Google-Drive-Index/-/raw/master/src/worker.js
+
+      - name: Modify GDI script
+        run: python3 scripts/modifyGDICode.py
+
+      - name: Prepare for deploy to Cloudflare Workers
+        run: |
+          mkdir -p ./GDI-Cloudflare/src
+          cp ./resources/GDI-modified.js ./GDI-Cloudflare/src/worker.js
+
+      - name: Get Wrangler Toml
+        run: scripts/getDataToFile.sh ${{ env.WRANGLER_TOML }} "GDI-Cloudflare/wrangler.toml"
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+
+      - name: Cache npm Prettier & Wrangler
+        uses: actions/cache@v3
+        id: npm-cache
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Prettier
+        run: |
+          npm install -g prettier
+          prettier --write GDI-Cloudflare/src/worker.js
+
+      - name: Deploy to Cloudflare Workers
+        working-directory: ./GDI-Cloudflare
+        run: |
+          npm install -g wrangler
+          wrangler deploy ./src/worker.js --compatibility-date $(date '+%Y-%m-%d')
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GDI-Cloudflare
+          path: ./
