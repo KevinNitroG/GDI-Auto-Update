@@ -95,4 +95,4 @@ jobs:
         working-directory: ./GDI-Cloudflare
         run: |
           npm install -g wrangler
-          wrangler deploy ./src/worker.js --compatibility-date $(date '+%Y-%m-%d')
+          wrangler deploy ./src/worker.js --compatibility-date $(date '+%Y-%m-%d') --config ./wrangler.toml
