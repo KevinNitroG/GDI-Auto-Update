@@ -44,6 +44,20 @@
 |  `USER_RCLONE_CONFIG`   | URL to raw code |      No      |                                  No need                                  | Rclone config file                                                                                                                               | [Rclone docs](https://rclone.org/docs/)                                                                                                                                                                                                                                                                                                |
 |   `RCLONE_DRIVE_NAME`   |    `string`     |      No      |                                `MyGDrive`                                 | Name of the drive to list all shared drives<br>In fact it will run command `rclone backend drives <MyGDrive>:`                                   |
 
+> **Note**
+>
+> For the Variable which need URL to raw code, you can use any website to create raw code like [gist github](https://gist.github.com/), [pastebin](https://pastebin.com/),...
+>
+> For gist:
+>
+> When you click on `raw`, the URL will be like:
+>
+> `https://gist.githubusercontent.com/<id1>/raw/<id2>/exampleOfDriveHehe.js`
+>
+> Remove the `<id2>` and paste in Github Action secret / variable
+>
+> `https://gist.githubusercontent.com/<id1>/raw/exampleOfDriveHehe.js`
+
 ### 3️⃣ Trigger workflow
 
 -   Workflow will run at [20:00 UTC everyday](../.github/workflows/GDIUpdate.yml#L5) _(by default)_
