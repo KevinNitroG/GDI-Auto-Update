@@ -101,5 +101,7 @@ jobs:
         uses: actions/upload-artifact@main
         if: ${{ env.UPLOAD_ARTIFACTS && always() }}
         with:
-          name: GDI-Cloudflare
-          path: ./
+          name: GDI-Cloudflare-Artifacts
+          path: |
+            ./resources
+            ./GDI-Cloudflare
