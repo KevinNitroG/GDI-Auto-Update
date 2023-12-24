@@ -2,8 +2,8 @@
 
 -   Auto fetch the latest source code of [GDI](gitlab.com/GoogleDriveIndex/Google-Drive-Index) _(Bhadoo Index)_
 -   Auto deploy to **Cloudflare Worker**
--   Automated using **Github Action**
--   Support Rclone to list all shared drives
+-   Automated using **Github Action** with schedule _(cron)_
+-   Support **Rclone** to list all shared drives
 
 ## 💁 BADGE
 
@@ -44,23 +44,25 @@
 |  `USER_RCLONE_CONFIG`   | URL to raw code |      No      |                                  No need                                  | Rclone config file                                                                                                                               | [Rclone docs](https://rclone.org/docs/)                                                                                                                                                                                                                                                                                                |
 |   `RCLONE_DRIVE_NAME`   |    `string`     |      No      |                                `MyGDrive`                                 | Name of the drive to list all shared drives<br>In fact it will run command `rclone backend drives <MyGDrive>:`                                   |
 
-> **Note**
+> [!NOTE]
 >
 > For the Variable which need URL to raw code, you can use any website to create raw code like [gist github](https://gist.github.com/), [pastebin](https://pastebin.com/),...
+
+> [!NOTE]
 >
-> For gist:
+> For GIST
 >
-> When you click on `raw`, the URL will be like:
+> -   When you click on `raw`, the URL will be like:
 >
-> `https://gist.githubusercontent.com/<id1>/raw/<id2>/exampleOfDriveHehe.js`
+>     -   `https://gist.githubusercontent.com/<id1>/raw/<id2>/exampleOfDriveHehe.js`
 >
-> Remove the `<id2>` and paste in Github Action secret / variable
+> -   Remove the `<id2>` and paste in Github Action secret / variable
 >
-> `https://gist.githubusercontent.com/<id1>/raw/exampleOfDriveHehe.js`
+>     -   `https://gist.githubusercontent.com/<id1>/raw/exampleOfDriveHehe.js`
 
 ### 3️⃣ Trigger workflow
 
--   Workflow will run at [20:00 UTC everyday](../.github/workflows/GDIUpdate.yml#L5) _(by default)_
+-   Workflow will run at [Runs at 8:00, only on Wednesday and Friday](../.github/workflows/GDIUpdate.yml#L5) - UTC _(by default)_
 -   Run by someone / yourself star the repo
 -   Or manually trigger workflow from [here](../../../actions/workflows/GDIUpdate.yml) _(Click this from your forked repo)_
 
