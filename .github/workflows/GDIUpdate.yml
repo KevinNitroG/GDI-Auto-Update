@@ -28,6 +28,7 @@ jobs:
       WRANGLER_TOML: ${{ secrets.WRANGLER_TOML || vars.WRANGLER_TOML }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN || vars.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID }}
+      UPLOAD_ARTIFACTS: ${{ secrets.UPLOAD_ARTIFACTS || vars.UPLOAD_ARTIFACTS }}
 
     steps:
       - name: Checkout repo
@@ -98,6 +99,7 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@main
+        if: always() && ${{ env.UPLOAD_ARTIFACTS }}
         with:
           name: GDI-Cloudflare
           path: ./
