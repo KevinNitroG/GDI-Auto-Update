@@ -1,0 +1,5 @@
+name = "kevinnitro-index" # Your worker name, it's https://<name>.<account>.workers.dev
+
+[[kv_namespaces]]                       # Not required but I use KV to store user login data
+binding = "ENV"                         # It's statics value by Bhadoo :v
+id = "123uy3asdi23o4234237sjh12k312o7t" # Take this in https://dash.cloudflare.com/<CLOUDFLARE_ACCOUNT_ID>/workers/kv/namespaces
