@@ -99,7 +99,7 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@main
-        if: always() && ${{ env.UPLOAD_ARTIFACTS }}
+        if: ${{ env.UPLOAD_ARTIFACTS && always() }}
         with:
           name: GDI-Cloudflare
           path: ./
