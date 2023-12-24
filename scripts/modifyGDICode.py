@@ -1,5 +1,7 @@
 from itertools import count
+from os import read, remove
 import re
+import json
 
 
 def replaceDataContent(data, start_pattern, end_pattern, file_to_open) -> list:
@@ -16,17 +18,27 @@ def replaceDataContent(data, start_pattern, end_pattern, file_to_open) -> list:
         if check == True and end_compiled_pattern.match(line):
             end_num_line = i
             break
-    counter = count(start=1, step=1)
-    done = False
-    for line in data:
-        if start_num_line < next(counter) < end_num_line:
-            if done == False:
-                with open(file_to_open, 'r', encoding='utf-8') as f:
-                    read_data = f.readlines()
-                result.extend(read_data)
-                done = True
-        else:
-            result.append(line)
+    # counter = count(start=1, step=1)
+    # done = False
+    # for line in data:
+    #     step = next(counter)
+    #     if (start_num_line - end_num_line == 1 and step == start_num_line + 1) or (step > start_num_line and step < end_num_line):
+    #         if done == False:
+    #             with open(file_to_open, 'r', encoding='utf-8') as f:
+    #                 read_data = f.readlines()
+    #             result.extend(read_data)
+    #             done = True
+    #     else:
+    #         result.append(line)
+
+    for i in range(start_num_line):
+        result.append(data[i])
+    with open(file_to_open, 'r', encoding='utf-8') as f:
+        read_data = f.readlines()
+    result.extend(read_data)
+    for i in range(end_num_line-1, len(data)):
+        result.append(data[i])
+
     return result
 
 
@@ -35,13 +47,37 @@ def replaceUserHeader(data) -> list:
 
 
 def replaceDriveRoot(data) -> list:
-    return replaceDataContent(data, r"^\s*roots\s*:\s*\[\s*$", r"^\s*\]\s*$", 'resources/driveRoot.json')
+    return replaceDataContent(data, r"^\s*\"roots\"\s*:\s*\[\s*$", r"^\s*\]\s*(,){0,1}\s*$", 'resources/finalDrives.json')
 
 
-def main():
+def mergeDriveRootAndRcloneDrives(first_file, sec_file, output_file) -> None:
+    with open(first_file, 'r', encoding='utf-8') as f:
+        driveRoot = json.load(f)
+    try:
+        with open(sec_file, 'r', encoding='utf-8') as f:
+            rcloneDrives = json.load(f)
+    except FileNotFoundError:
+        rcloneDrives = []
+    for drive in rcloneDrives:
+        driveRoot.append(drive)
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(driveRoot, f, indent=4)
+
+
+def removeSquareBrackets(file) -> None:
+    with open(file, 'r', encoding='utf-8') as f:
+        data = f.readlines()
+    with open(file, 'w', encoding='utf-8') as f:
+        f.writelines(data[1:len(data)-1])
+
+
+def main() -> None:
     with open('resources/GDI.js', 'r', encoding='utf-8') as f:
         GDIContent = f.readlines()
     GDIContent = replaceUserHeader(GDIContent)
+    mergeDriveRootAndRcloneDrives(
+        'resources/driveRoot.json', 'resources/rcloneDrives.json', 'resources/finalDrives.json')
+    removeSquareBrackets('resources/finalDrives.json')
     GDIContent = replaceDriveRoot(GDIContent)
     with open('resources/GDI-modified.js', 'w', encoding='utf-8') as f:
         f.writelines(GDIContent)
