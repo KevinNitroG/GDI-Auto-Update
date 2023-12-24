@@ -92,7 +92,12 @@ jobs:
           prettier --write GDI-Cloudflare/src/worker.js
 
       - name: Deploy to Cloudflare Workers
-        working-directory: ./GDI-Cloudflare
         run: |
           npm install -g wrangler
-          wrangler deploy ./src/worker.js --compatibility-date $(date '+%Y-%m-%d') --config ./wrangler.toml --name gdi
+          wrangler deploy ./GDI-Cloudflare/src/worker.js --compatibility-date $(date '+%Y-%m-%d') --config ./GDI-Cloudflare/wrangler.toml
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@main
+        with:
+          name: GDI-Cloudflare
+          path: ./

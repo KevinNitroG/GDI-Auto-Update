@@ -18,19 +18,6 @@ def replaceDataContent(data, start_pattern, end_pattern, file_to_open) -> list:
         if check == True and end_compiled_pattern.match(line):
             end_num_line = i
             break
-    # counter = count(start=1, step=1)
-    # done = False
-    # for line in data:
-    #     step = next(counter)
-    #     if (start_num_line - end_num_line == 1 and step == start_num_line + 1) or (step > start_num_line and step < end_num_line):
-    #         if done == False:
-    #             with open(file_to_open, 'r', encoding='utf-8') as f:
-    #                 read_data = f.readlines()
-    #             result.extend(read_data)
-    #             done = True
-    #     else:
-    #         result.append(line)
-
     for i in range(start_num_line):
         result.append(data[i])
     with open(file_to_open, 'r', encoding='utf-8') as f:
