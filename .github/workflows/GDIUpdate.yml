@@ -78,7 +78,7 @@ jobs:
         run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
 
       - name: Cache npm Prettier & Wrangler
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: npm-cache
         if: steps.npm-cache.outputs.cache-hit != 'true'
         with:
